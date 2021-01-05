@@ -1,39 +1,53 @@
 package imageviewer.apps.mock;
 
+import imageviewer.control.Command;
+import imageviewer.control.ExitImageCommand;
+import imageviewer.control.NextImageCommand;
+import imageviewer.control.PrevImageCommand;
 import imageviewer.model.Image;
 import imageviewer.view.ImageDisplay;
 import imageviewer.view.ImageLoader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
+    private static final Scanner scanner = new Scanner(System.in);
+    
     public static void main(String[] args) {
         List<Image> images = new MockImageLoader().load(); 
         ImageDisplay imageDisplay = new MockImageDisplay();
-        Scanner scanner = new Scanner(System.in);
-        int index = 0;
-        while(true){
-            imageDisplay.display(images.get(index));
-            String input = scanner.next().toUpperCase();
-            if (input.equals("N")) index = bound(index+1, images.size());
-            if (input.equals("P")) index = bound(index-1, images.size());
-            if (input.equals("Q")) System.exit(0);
-        }
+        imageDisplay.display(images.get(0));
+        
+        Map<String,Command> commands = new HashMap<>();
+        commands.put("N", new NextImageCommand(images,imageDisplay));
+        commands.put("P", new PrevImageCommand(images,imageDisplay));
+        commands.put("Q", new ExitImageCommand());
+
+        while(true) commands.get(input()).execute();
     }
 
-    private static int bound(int index, int size) {
-        return (index + size) % size;
+    private static String input() {
+        return scanner.next().toUpperCase();
     }
     
     public static class MockImageDisplay implements ImageDisplay{
 
+        private Image image;    
+        
         @Override
         public void display(Image image) {
+            this.image = image;
             System.out.println(image.getName());
         }
-    
-}
+        
+        @Override
+        public Image currentImage(){
+            return image;
+        }
+    }
     
     public static class MockImageLoader implements ImageLoader{
         
