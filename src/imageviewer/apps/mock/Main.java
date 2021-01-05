@@ -18,14 +18,12 @@ public class Main {
             String input = scanner.next().toUpperCase();
             if (input.equals("N")) index = bound(index+1, images.size());
             if (input.equals("P")) index = bound(index-1, images.size());
-            if (input.equals("Q")) break;
+            if (input.equals("Q")) System.exit(0);
         }
     }
 
     private static int bound(int index, int size) {
-        if (index >= size) return 0;
-        if (index < 0) return size -1;
-        return index;
+        return (index + size) % size;
     }
     
     public static class MockImageDisplay implements ImageDisplay{
