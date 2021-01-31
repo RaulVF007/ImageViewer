@@ -1,29 +1,45 @@
 package imageviewer.apps.swing;
 
+import imageviewer.model.Image;
+import imageviewer.view.ImageDisplay;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-public class ImagePanel extends JPanel {
-
+public class ImagePanel extends JPanel implements ImageDisplay{
     private BufferedImage bitmap;
-    
-    public ImagePanel() {
-        try {
-            bitmap = ImageIO.read(new File("fotos/foto1.jpg"));
-        } catch (IOException ex) {
-        }
-    }
+    private Image image;
     
     @Override
     public void paint(Graphics g){
+        g.setColor(Color.white);
+        g.fillRect(0, 0, getWidth(), getHeight());
+        if (bitmap == null) return;
         Scale scale = new Scale(bitmap.getWidth(), bitmap.getHeight(), getWidth(), getHeight());
         g.drawImage(bitmap, scale.x(), scale.y(), scale.width(), scale.heigth(), null);
+    }
+
+    @Override
+    public void display(Image image) {
+        this.image = image;
+        loadBitmap();
+        repaint();
+    }
+
+    @Override
+    public Image currentImage() {
+        return image;
+    }
+
+    private void loadBitmap() {
+        try {
+            bitmap = ImageIO.read(new File(image.getName()));
+        } catch (IOException ex) {
+        }
     }
 
     private static class Scale {
