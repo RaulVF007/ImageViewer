@@ -22,21 +22,42 @@ public class ImagePanel extends JPanel {
     
     @Override
     public void paint(Graphics g){
-        int iw = bitmap.getWidth();
-        int ih = bitmap.getHeight();
-        double ir = (double) iw / ih;
+        Scale scale = new Scale(bitmap.getWidth(), bitmap.getHeight(), getWidth(), getHeight());
+        g.drawImage(bitmap, scale.x(), scale.y(), scale.width(), scale.heigth(), null);
+    }
+
+    private static class Scale {
+        private final int iw;
+        private final int ih;
+        private final int pw;
+        private final int ph;
+
+        private Scale(int iw, int ih, int pw, int ph) {
+            this.iw = iw;
+            this.ih = ih;
+            this.pw = pw;
+            this.ph = ph;
+        }
         
-        int pw = getWidth();
-        int ph = getHeight();
-        double pr = (double) pw / ph;
+        int x(){
+            return (pw - width()) / 2;
+        }
+
+        int y(){
+            return (ph - heigth()) / 2; 
+        }
         
-        int sw = ir > pr ? pw : (int) (iw * (double) ph / ih);
-        int sh = ir > pr ? (int) (ih * (double) pw / iw) : ph;
-        int sx = (pw - sw) / 2;
-        int sy = (ph - sh) / 2;
+        int width(){
+           return adjustWidth() ? pw : (int) (iw * (double) ph / ih);
+        }
         
-        g.drawImage(bitmap, sx, sy, sw, sh, null);
-        
+        int heigth(){
+            return adjustWidth() ? (int) (ih * (double) pw / iw) : ph;
+        }
+                
+        private boolean adjustWidth(){
+            return iw * ph > pw * ih;
+        }
     }
 }
 
