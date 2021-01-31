@@ -1,9 +1,7 @@
 package imageviewer.apps.mock;
 
 import imageviewer.control.Command;
-import imageviewer.control.ExitImageCommand;
-import imageviewer.control.NextImageCommand;
-import imageviewer.control.PrevImageCommand;
+import imageviewer.control.InitCommand;
 import imageviewer.model.Image;
 import imageviewer.view.ImageDisplay;
 import imageviewer.view.ImageLoader;
@@ -14,22 +12,25 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
-    private static final Scanner scanner = new Scanner(System.in);
+    private final static Command NullCommand = new Command.Null();
+    private final Scanner scanner = new Scanner(System.in);
+    private final Map<String,Command> commands = new HashMap<>();
     
     public static void main(String[] args) {
-        List<Image> images = new MockImageLoader().load(); 
-        ImageDisplay imageDisplay = new MockImageDisplay();
-        imageDisplay.display(images.get(0));
-        
-        Map<String,Command> commands = new HashMap<>();
-        commands.put("N", new NextImageCommand(images,imageDisplay));
-        commands.put("P", new PrevImageCommand(images,imageDisplay));
-        commands.put("Q", new ExitImageCommand());
-
-        while(true) commands.get(input()).execute();
+        new Main().execute();
+    }
+    
+    public Main(){
+        InitCommand init = new InitCommand(new MockImageLoader().load(), new MockImageDisplay());
+        init.execute();
+        commands.putAll(init.getCommands());
+    }
+    
+    private void execute(){
+        while(true) commands.getOrDefault(input(), NullCommand).execute();    
     }
 
-    private static String input() {
+    private String input() {
         return scanner.next().toUpperCase();
     }
     
